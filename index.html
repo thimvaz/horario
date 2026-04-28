@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Horário - Provas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 15px;
+            border-bottom: 2px solid #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header img {
+            max-height: 80px;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 3vh;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            border-bottom: 2px solid #000;
+            background-color: #f9f9f9;
+        }
+
+        nav button {
+            flex: 1;
+            padding: 12px 5px;
+            font-size: 1.8vh;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            border-right: 1px solid #000;
+        }
+
+        nav button.active {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+        }
+
+        .left-panel, .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .left-panel {
+            border-right: 2px solid #000;
+        }
+
+        .clock-label {
+            font-size: 2.5vh;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        #clock {
+            font-size: 12vw;
+            font-weight: bold;
+        }
+
+        .info-item {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 2vh;
+            text-transform: uppercase;
+            color: #444;
+        }
+
+        .info-value {
+            font-size: 7vw;
+            font-weight: bold;
+            display: block;
+        }
+
+        #avisos-container {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 2px dashed #000;
+            text-align: center;
+            min-width: 80%;
+        }
+
+        .aviso-texto {
+            font-size: 2.5vh;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="logo-criarte.png" alt="Logo Colégio Criarte">
+        <h1>Boa prova</h1>
+    </header>
+
+    <nav>
+        <button class="tab-btn active" data-target="em">Ensino Médio</button>
+        <button class="tab-btn" data-target="c1_567">5º/6º/7º (C1)</button>
+        <button class="tab-btn" data-target="c2_567">5º/6º/7º (C2)</button>
+        <button class="tab-btn" data-target="c1_89">8º/9º (C1)</button>
+        <button class="tab-btn" data-target="c2_89">8º/9º (C2)</button>
+    </nav>
+
+    <main>
+        <div class="left-panel">
+            <div class="clock-label">Horário de Brasília</div>
+            <div id="clock">00:00:00</div>
+        </div>
+
+        <div class="right-panel">
+            <div class="info-item">
+                <span class="info-label">Início</span>
+                <span class="info-value" id="inicio">--:--</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tempo Mínimo</span>
+                <span class="info-value" id="minimo">--:--</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Término</span>
+                <span class="info-value" id="termino">--:--</span>
+            </div>
+            
+            <div id="avisos-container" style="display: none;">
+                <span class="info-label">Observações</span>
+                <div class="aviso-texto" id="aviso-content"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const scheduleData = {
+            em:      { inicio: "08:00", minimo: "10:00", termino: "13:00", avisos: "" },
+            c1_567:  { inicio: "10:00", minimo: "11:45", termino: "12:15", avisos: "" },
+            c2_567:  { inicio: "07:15", minimo: "08:15", termino: "08:45", avisos: "Liberação de banheiro: 08h às 08h15" },
+            c1_89:   { inicio: "07:15", minimo: "09:00", termino: "09:30", avisos: "" },
+            c2_89:   { inicio: "10:00", minimo: "11:45", termino: "12:15", avisos: "" }
+        };
+
+        function updateClock() {
+            const options = { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        const buttons = document.querySelectorAll('.tab-btn');
+        const avisoContainer = document.getElementById('avisos-container');
+        const avisoContent = document.getElementById('aviso-content');
+
+        function updateInfo(target) {
+            const data = scheduleData[target];
+            document.getElementById('inicio').textContent = data.inicio;
+            document.getElementById('minimo').textContent = data.minimo;
+            document.getElementById('termino').textContent = data.termino;
+
+            if (data.avisos) {
+                avisoContainer.style.display = 'block';
+                avisoContent.textContent = data.avisos;
+            } else {
+                avisoContainer.style.display = 'none';
+            }
+        }
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                buttons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                updateInfo(button.dataset.target);
+            });
+        });
+
+        updateInfo('em');
+    </script>
+</body>
+</html>
